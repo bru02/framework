@@ -2,6 +2,7 @@ import '#polyfill'
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
 import { localCall } from '../server'
 import { requestHasBody, useRequestBody } from '../server/utils'
+import { assets } from '#assets'
 
 const PUBLIC_PATH = process.env.PUBLIC_PATH // Default: /_nuxt/
 
@@ -11,7 +12,9 @@ addEventListener('fetch', (event: any) => {
 
 async function handleEvent (event) {
   try {
-    return await getAssetFromKV(event, { cacheControl: assetsCacheControl })
+    if (assets.hasItem(event.request.url)) {
+      return await getAssetFromKV(event, { cacheControl: assetsCacheControl })
+    }
   } catch (_err) {
     // Ignore
   }
